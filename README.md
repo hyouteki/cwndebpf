@@ -11,7 +11,7 @@ An eBPF program to modify the kernel's congestion window (cwnd) based on a user-
 > Unloading the program is crucial; otherwise, the program and map will remain persistent until the system restarts.
 
 ## log\_tcp\_cwnd
-An eBPF program to log the value of kernel congestion window (cwnd) to the trace pipe whenever a TCP connectino is used between a specific IP.
+An eBPF program to log the value of kernel congestion window (cwnd) to the trace pipe whenever a TCP connection is used for a HTTPS request.
 
 ### Getting started
 - `make`: build `vmlinux.h` and the program.
