@@ -46,22 +46,7 @@ int kernel_cwnd(struct bpf_sock_ops *skops) {
 	bpf_printk("log: skops opcode %d", op);
 	// if op neither active nor passive TCP connection; skip
 	if (op != BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB && op != BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB) return 0;
-	
-	fallbackValue = bpf_map_lookup_elem(&FallbackMap, &key);
-	if (!fallbackValue) {
-		// key not present in fallback map
-		ret = bpf_map_update_elem(&FallbackMap, &key, &val, BPF_NOEXIST);
-		if (ret != 0) bpf_printk("log: fallback value update to NOEXIST failed");
-		return 0;
-	}
 
-	if (!*fallbackValue) {
-		// fallback value is set to 0, false
-		bpf_printk("log: fallback set to false, skipped cwnd updation");
-		return 0;
-	}
-		
-	// key present in fallback map
 	userCwnd = bpf_map_lookup_elem(&CwndMap, &key);
 	if (!userCwnd) {
 		// key not present in cwnd map
