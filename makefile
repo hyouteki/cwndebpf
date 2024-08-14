@@ -2,8 +2,8 @@ BPFTOOL = /home/lakshay21060/bpftool/src/bpftool
 VAL ?= 00
 MAP ?= CwndMap
 
-default: ./build/kernel_cwnd.o ./build/log_tcp_cwnd.o
-.PHONY: unload_kernel_cwnd.sh unload_log_tcp_cwnd.sh
+default: ./build/kernel_cwnd.o ./build/log_tcp_cwnd.o ./build/always_update_cwnd.o
+.PHONY: unload_kernel_cwnd.sh unload_log_tcp_cwnd.sh unload_always_update_cwnd.sh
 
 ./build/kernel_cwnd.o: kernel_cwnd.bpf.c vmlinux.h
 	mkdir -p build
