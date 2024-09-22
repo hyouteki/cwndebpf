@@ -1,37 +1,40 @@
-## kernel\_cwnd
-An eBPF program to modify the kernel's congestion window (cwnd) based on a user-space provided value stored in an eBPF map. The modification occurs only if a fallback flag, stored in another eBPF map, is set to true. The user-space program updates these maps using the `bpftool map update` command.
+# kernel\_cwnd
 
-### Getting started
-- `make`: build `vmlinux.h` and the program.
-- `make load_kernel_cwnd`: attach the hooks and load the program.
-- `make map.update MAP=CwndMap VAL=00`: dummy user space program for testing the loaded eBPF program.
-- `make map.dump MAP=CwndMap`: dump the contents of `CwndMap` onto the stdout.
-- `make unload_kernel_cwnd`: detach the hooks and unload the program.
+An eBPF program that modifies the kernel's congestion window (cwnd) based on a user-space-provided value stored in an eBPF map. The modification occurs only if a fallback flag, stored in another eBPF map, is set to true. The user-space program updates these maps using the `bpftool map update` command.
 
-## log\_tcp\_cwnd
-An eBPF program to log the value of kernel congestion window (cwnd) to the trace pipe whenever a TCP connection is used for a HTTPS request.
+## Getting Started
+- `make`: Build `vmlinux.h` and the program.
+- `make load_kernel_cwnd`: Attach the hooks and load the program.
+- `make map.update MAP=CwndMap VAL=00`: Update the `CwndMap` for testing the loaded eBPF program.
+- `make map.dump MAP=CwndMap`: Dump the contents of `CwndMap` to stdout.
+- `make unload_kernel_cwnd`: Detach the hooks and unload the program.
 
-### Getting started
-- `make`: build `vmlinux.h` and the program.
-- `make load_log_tcp_cwnd`: attach to the tracepoint and load the program.
-- `make trace_log_tcp_cwnd`: flushes the trace\_pipe and stores new logs into `log_tcp_cwnd.log`
-- `make log_tcp_cwnd.csv`: process the `log_tcp_cwnd.log` and creates a csv file.
-- `make unload_log_tcp_cwnd`: detach the hooks and unload the program.
+# log\_tcp\_cwnd
 
-## always\_update\_cwnd
-An eBPF program to modify the kernel's congestion window (cwnd) based on a user-space provided value stored in an eBPF map. Unlike `kernel_cwnd.bpf.c` the updation happens everytime. The user-space program updates these maps using the `bpftool map update` command.
+An eBPF program that logs the kernel's congestion window (cwnd) value to the trace pipe whenever a TCP connection is used for an HTTPS request.
 
-### Getting started
-- `make`: build `vmlinux.h` and the program.
-- `make load_always_update_cwnd`: attach the hooks and load the program.
-- `make map.update MAP=CwndMap VAL=00`: dummy user space program for testing the loaded eBPF program.
-- `make map.dump MAP=CwndMap`: dump the contents of `CwndMap` onto the stdout.
-- `make unload_always_update_cwnd`: detach the hooks and unload the program.
+## Getting Started
+- `make`: Build `vmlinux.h` and the program.
+- `make load_log_tcp_cwnd`: Attach to the tracepoint and load the program.
+- `make trace_log_tcp_cwnd`: Flush the trace pipe and store new logs in `log_tcp_cwnd.log`.
+- `make log_tcp_cwnd.csv`: Process `log_tcp_cwnd.log` and create a CSV file.
+- `make unload_log_tcp_cwnd`: Detach the hooks and unload the program.
 
-> [!Important]
-> Unloading the program is crucial; otherwise, the program and map will remain persistent until the system restarts.
+# always\_update\_cwnd
 
-## Installation
+An eBPF program that modifies the kernel's congestion window (cwnd) based on a user-space-provided value stored in an eBPF map. Unlike `kernel_cwnd.bpf.c`, the update occurs every time. The user-space program updates these maps using the `bpftool map update` command.
+
+## Getting Started
+- `make`: Build `vmlinux.h` and the program.
+- `make load_always_update_cwnd`: Attach the hooks and load the program.
+- `make map.update MAP=CwndMap VAL=00`: Update the `CwndMap` for testing the loaded eBPF program.
+- `make map.dump MAP=CwndMap`: Dump the contents of `CwndMap` to stdout.
+- `make unload_always_update_cwnd`: Detach the hooks and unload the program.
+
+> **Important**  
+> Unloading the program is crucial; otherwise, the program and map will persist until the system restarts.
+
+# Installation
 ```bash
 git clone https://github.com/hyouteki/cwndebpf --depth=1
 cd cwndebpf
@@ -40,8 +43,8 @@ git clone --recurse-submodules https://github.com/libbpf/bpftool
 cd bpftool/src
 make
 ```
-Update the path of `BPFTOOL` in makefile it would be something `~/cwndebpf/bpftool/src/bpftool`.
-	
+Update the path of `BPFTOOL` in the Makefile to something like `~/cwndebpf/bpftool/src/bpftool`.
+
 ## Dependency
 - [libbpf-dev](https://packages.ubuntu.com/search?keywords=libbpf-dev)
 - [bpftool](https://github.com/libbpf/bpftool)
