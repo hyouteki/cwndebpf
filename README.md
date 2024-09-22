@@ -48,6 +48,7 @@ Update the path of `BPFTOOL` in the Makefile to something like `~/cwndebpf/bpfto
 ## Dependency
 - [libbpf-dev](https://packages.ubuntu.com/search?keywords=libbpf-dev)
 - [bpftool](https://github.com/libbpf/bpftool)
+- [Clang](https://clang.llvm.org/) and [LLVM](https://llvm.org/)
 
 ## References
 - [Learning eBPF - lizrice](https://github.com/lizrice/learning-ebpf)

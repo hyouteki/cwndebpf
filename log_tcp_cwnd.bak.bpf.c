@@ -1,15 +1,6 @@
 #include "vmlinux.h"
 #include <bpf/bpf_helpers.h>
 
-#if Store_Cwnd
-struct {
-    __uint(type, BPF_MAP_TYPE_HASH);
-    __type(key, __u32);
-    __type(value, __u32);
-    __uint(max_entries, 1);
-} CwndMap SEC(".maps");
-#endif
-
 SEC("tracepoint/tcp/tcp_probe")
 int log_tcp_cwnd(struct trace_event_raw_tcp_probe *ctx) {
 
@@ -28,12 +19,6 @@ int log_tcp_cwnd(struct trace_event_raw_tcp_probe *ctx) {
     bpf_probe_read(&rcv_wnd, sizeof(rcv_wnd), &ctx->rcv_wnd);
 
     bpf_printk("snd_cwnd: %d, snd_wnd: %d, rcv_wnd: %d\n", snd_cwnd, snd_wnd, rcv_wnd);
-
-#if Store_Cwnd
-    u32 key = 0;
-    int ret = bpf_map_update_elem(&CwndMap, &key, &snd_wnd, BPF_ANY);
-	if (ret != 0) bpf_printk("log: cwnd value update to '%d' failed", snd_wnd);
-#endif
 
     return 0;
 }

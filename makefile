@@ -4,6 +4,7 @@ MAP ?= CwndMap
 
 BPF_SOURCES = kernel_cwnd.bpf.c log_tcp_cwnd.bpf.c always_update_cwnd.bpf.c
 BPF_OBJECTS = $(patsubst %.bpf.c, build/%.o, $(BPF_SOURCES))
+C_DEFS = "-DStore_Cwnd"
 
 default: $(BPF_OBJECTS)
 
@@ -11,7 +12,7 @@ default: $(BPF_OBJECTS)
 	mkdir -p build
 	clang \
 		-target bpf \
-		-D __TARGET_ARCH_$(ARCH) \
+		-D __TARGET_ARCH_$(ARCH) $(C_DEFS)\
 		-I/usr/include/$(shell uname -m)-linux-gnu \
 		-g -O2 -c $< -o $@
 	llvm-strip -g $@
@@ -66,4 +67,4 @@ log_tcp_cwnd.csv: process_cwnd_logs.py
 
 setup:
 	sudo apt-get update
-	sudo apt-get install linux-headers-$(uname -r)
+	sudo apt-get install clang llvm linux-headers-$(uname -r)
