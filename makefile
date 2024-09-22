@@ -2,59 +2,40 @@ BPFTOOL = /home/lakshay21060/bpftool/src/bpftool
 VAL ?= 00
 MAP ?= CwndMap
 
-default: ./build/kernel_cwnd.o ./build/log_tcp_cwnd.o ./build/always_update_cwnd.o
-.PHONY: unload_kernel_cwnd.sh unload_log_tcp_cwnd.sh unload_always_update_cwnd.sh
+BPF_SOURCES = kernel_cwnd.bpf.c log_tcp_cwnd.bpf.c always_update_cwnd.bpf.c
+BPF_OBJECTS = $(patsubst %.bpf.c, build/%.o, $(BPF_SOURCES))
 
-./build/kernel_cwnd.o: kernel_cwnd.bpf.c vmlinux.h
+default: $(BPF_OBJECTS)
+
+./build/%.o: %.bpf.c vmlinux.h
 	mkdir -p build
 	clang \
 		-target bpf \
 		-D __TARGET_ARCH_$(ARCH) \
 		-I/usr/include/$(shell uname -m)-linux-gnu \
-		-g -O2 -c kernel_cwnd.bpf.c -o ./build/kernel_cwnd.o
-	llvm-strip -g ./build/kernel_cwnd.o
-
-./build/log_tcp_cwnd.o: log_tcp_cwnd.bpf.c vmlinux.h
-	mkdir -p build
-	clang \
-		-target bpf \
-			-D __TARGET_ARCH_$(ARCH) \
-			-I/usr/include/$(shell uname -m)-linux-gnu \
-			-g -O2 -c log_tcp_cwnd.bpf.c -o ./build/log_tcp_cwnd.o
-	llvm-strip -g ./build/log_tcp_cwnd.o
-
-./build/always_update_cwnd.o: always_update_cwnd.bpf.c vmlinux.h
-	mkdir -p build
-	clang \
-		-target bpf \
-		-D __TARGET_ARCH_$(ARCH) \
-		-I/usr/include/$(shell uname -m)-linux-gnu \
-		-g -O2 -c always_update_cwnd.bpf.c -o ./build/always_update_cwnd.o
-	llvm-strip -g ./build/always_update_cwnd.o
+		-g -O2 -c $< -o $@
+	llvm-strip -g $@
 
 vmlinux.h:
 	sudo $(BPFTOOL) btf dump file /sys/kernel/btf/vmlinux format c > ./vmlinux.h
 
-load_kernel_cwnd.sh: unload_kernel_cwnd.sh
-	sudo bash ./load_kernel_cwnd.sh
+load_kernel_cwnd: unload_kernel_cwnd
+	sudo BPFTOOL=$(BPFTOOL) PROGRAM_NAME="kernel_cwnd" bash ./load_kernel_cwnd.sh
 
-unload_kernel_cwnd.sh:
-	sudo bash ./unload_kernel_cwnd.sh
+unload_kernel_cwnd:
+	sudo BPFTOOL=$(BPFTOOL) PROGRAM_NAME="kernel_cwnd" bash ./unload_kernel_cwnd.sh
 
-load_log_tcp_cwnd: unload_log_tcp_cwnd.sh ./build/log_tcp_cwnd.o
+load_log_tcp_cwnd: unload_log_tcp_cwnd ./build/log_tcp_cwnd.o
 	sudo $(BPFTOOL) prog load ./build/log_tcp_cwnd.o /sys/fs/bpf/log_tcp_cwnd autoattach
 
-unload_log_tcp_cwnd.sh:
-	sudo bash ./unload_log_tcp_cwnd.sh
+unload_log_tcp_cwnd:
+	sudo BPFTOOL=$(BPFTOOL) bash ./unload_log_tcp_cwnd.sh
 
-load_always_update_cwnd.sh: unload_always_update_cwnd.sh
-	sudo bash ./load_always_update_cwnd.sh
+load_always_update_cwnd: unload_always_update_cwnd
+	sudo BPFTOOL=$(BPFTOOL) PROGRAM_NAME="always_update_cwnd" bash ./load_kernel_cwnd.sh
 
-unload_always_update_cwnd.sh:
-	sudo bash ./unload_always_update_cwnd.sh
-
-trace:
-	sudo cat /sys/kernel/debug/tracing/trace_pipe
+unload_always_update_cwnd:
+	sudo BPFTOOL=$(BPFTOOL) PROGRAM_NAME="always_update_cwnd" bash ./unload_kernel_cwnd.sh
 
 logs:
 	grep -rn "\[VOD-STREAM-QOE\]" /usr/local/lsws/logs/error.log
@@ -71,6 +52,9 @@ map.dump:
 show:
 	-sudo $(BPFTOOL) prog show name kernel_cwnd --pretty
 	-sudo $(BPFTOOL) prog show name log_tcp_cwnd --pretty
+
+trace:
+	sudo cat /sys/kernel/debug/tracing/trace_pipe
 
 trace_log_tcp_cwnd: trace_flush.sh
 	chmod +x trace_flush.sh
