@@ -1,4 +1,4 @@
-BPFTOOL = /home/lakshay21060/bpftool/src/bpftool
+BPFTOOL = ./bpftool/src/bpftool
 VAL ?= 00
 MAP ?= CwndMap
 
@@ -6,7 +6,7 @@ BPF_SOURCES = kernel_cwnd.bpf.c log_tcp_cwnd.bpf.c always_update_cwnd.bpf.c
 BPF_OBJECTS = $(patsubst %.bpf.c, build/%.o, $(BPF_SOURCES))
 C_DEFS = "-DStore_Cwnd"
 
-default: $(BPF_OBJECTS)
+default: $(BPF_OBJECTS) ./build/read_cwnd_map
 
 ./build/%.o: %.bpf.c vmlinux.h
 	mkdir -p build
@@ -16,6 +16,13 @@ default: $(BPF_OBJECTS)
 		-I/usr/include/$(shell uname -m)-linux-gnu \
 		-g -O2 -c $< -o $@
 	llvm-strip -g $@
+
+./build/read_cwnd_map: read_cwnd_map.c
+	clang \
+		-D __TARGET_ARCH_$(ARCH) \
+		-I/usr/include/$(shell uname -m)-linux-gnu \
+		-g -O2 $< -o $@ -lbpf
+	strip -g $@
 
 vmlinux.h:
 	sudo $(BPFTOOL) btf dump file /sys/kernel/btf/vmlinux format c > ./vmlinux.h
@@ -61,6 +68,9 @@ trace_log_tcp_cwnd: trace_flush.sh
 	chmod +x trace_flush.sh
 	./trace_flush.sh
 	sudo cat /sys/kernel/debug/tracing/trace_pipe > log_tcp_cwnd.log
+
+read_cwnd_map: ./build/read_cwnd_map
+	./build/read_cwnd_map
 
 log_tcp_cwnd.csv: process_cwnd_logs.py
 	python3 process_cwnd_logs.py

@@ -19,6 +19,7 @@ An eBPF program that logs the kernel's congestion window (cwnd) value to the tra
 - `make trace_log_tcp_cwnd`: Flush the trace pipe and store new logs in `log_tcp_cwnd.log`.
 - `make log_tcp_cwnd.csv`: Process `log_tcp_cwnd.log` and create a CSV file.
 - `make unload_log_tcp_cwnd`: Detach the hooks and unload the program.
+- `make read_cwnd_map`: Demo to read the value of CwndMap in user-space program.
 
 # always\_update\_cwnd
 
@@ -43,7 +44,6 @@ git clone --recurse-submodules https://github.com/libbpf/bpftool
 cd bpftool/src
 make
 ```
-Update the path of `BPFTOOL` in the Makefile to something like `~/cwndebpf/bpftool/src/bpftool`.
 
 ## Dependency
 - [libbpf-dev](https://packages.ubuntu.com/search?keywords=libbpf-dev)
