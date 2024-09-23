@@ -28,7 +28,7 @@ struct {
 } FallbackMap SEC(".maps");
 
 SEC("sockops")
-int kernel_cwnd(struct bpf_sock_ops *skops) {
+int always_update_cwnd(struct bpf_sock_ops *skops) {
 	struct in_addr addr;
 	// storing dest IPv4 for logging
 	addr.s_addr = skops->remote_ip4;

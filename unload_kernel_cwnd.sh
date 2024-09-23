@@ -14,4 +14,4 @@ fi
 if [ -f "/sys/fs/bpf/${PROGRAM_NAME}" ]; then
 	sudo $BPFTOOL cgroup detach /sys/fs/cgroup/unified/ sock_ops pinned /sys/fs/bpf/${PROGRAM_NAME}
 fi
-sudo rm -f /sys/fs/bpf/${PROGRAM_NAME} /sys/fs/bpf/CwndMap /sys/fs/bpf/FallbackMap
+sudo rm -f /sys/fs/bpf/${PROGRAM_NAME} /sys/fs/bpf/FallbackMap

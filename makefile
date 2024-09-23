@@ -35,6 +35,7 @@ unload_kernel_cwnd:
 
 load_log_tcp_cwnd: unload_log_tcp_cwnd ./build/log_tcp_cwnd.o
 	sudo $(BPFTOOL) prog load ./build/log_tcp_cwnd.o /sys/fs/bpf/log_tcp_cwnd autoattach
+	sudo $(BPFTOOL) map pin name CwndMap /sys/fs/bpf/CwndMap
 
 unload_log_tcp_cwnd:
 	sudo BPFTOOL=$(BPFTOOL) bash ./unload_log_tcp_cwnd.sh
@@ -59,6 +60,7 @@ map.dump:
 
 show:
 	-sudo $(BPFTOOL) prog show name kernel_cwnd --pretty
+	-sudo $(BPFTOOL) prog show name always_update_cwnd --pretty
 	-sudo $(BPFTOOL) prog show name log_tcp_cwnd --pretty
 
 trace:
