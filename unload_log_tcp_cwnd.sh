@@ -1,6 +1,5 @@
 #!/bin/bash
-
-set -x
+set -xe
 
 if [ -z "${BPFTOOL}" ]; then
     echo "error: BPFTOOL is not set"
@@ -12,4 +11,4 @@ if [ -f "/sys/fs/bpf/log_tcp_cwnd" ]; then
 	rm -f /sys/fs/bpf/log_tcp_cwnd
 fi
 
-rm -f /sys/fs/bpf/CwndMap
+rm -f /sys/fs/bpf/CwndMap /sys/fs/bpf/SSThreshMap

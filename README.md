@@ -32,7 +32,7 @@ An eBPF program that modifies the kernel's congestion window (cwnd) based on a u
 - `make map.dump MAP=CwndMap`: Dump the contents of `CwndMap` to stdout.
 - `make unload_always_update_cwnd`: Detach the hooks and unload the program.
 
-> **Important**  
+> **Important**
 > Unloading the program is crucial; otherwise, the program and map will persist until the system restarts.
 
 # Installation

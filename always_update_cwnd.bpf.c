@@ -43,13 +43,13 @@ int verify_remote_addr(__u32 remote_ip4) {
         (remote_ip4 >> 16) & 0xFF,
         (remote_ip4 >> 8) & 0xFF,
         remote_ip4 & 0xFF };
-    
+
     unsigned char actual_remote_ip4[4] = {103, 25, 231, 106};
 
     for (size_t i = 0; i < 4; ++i) {
         if (octets[i] != actual_remote_ip4[i]) return 0;
     }
-    
+
     return 1;
 }
 
@@ -64,7 +64,7 @@ int always_update_cwnd(struct bpf_sock_ops *skops) {
 
     /*
      * key: for client identification (currently the only value for key is zero)
-     * TODO: modify key to be a combination of client id & QUIC connection id  
+     * TODO: modify key to be a combination of client id & QUIC connection id
      * op: socket operation type
      * *user_wnd: cwnd for that client (previously stored by the user space code)
      * ret: return value
@@ -83,7 +83,7 @@ int always_update_cwnd(struct bpf_sock_ops *skops) {
         if (ret != 0) bpf_printk("log: CWND value update to NOEXIST failed");
         return 0;
     }
-        
+
     // key present in cwnd map
     if (!*userCwnd) return 0;
     // *userCwnd = ceil(*userCwnd/MSS)

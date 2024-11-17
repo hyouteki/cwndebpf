@@ -17,5 +17,6 @@ sudo BPFTOOL="${BPFTOOL}" PROGRAM_NAME="${PROGRAM_NAME}" bash ./unload_kernel_cw
 
 sudo $BPFTOOL prog load ./build/${PROGRAM_NAME}.o /sys/fs/bpf/${PROGRAM_NAME} \
 	 map name CwndMap name CwndMap \
+	 map name SSThreshMap name SSThreshMap \
 	 pinmaps /sys/fs/bpf/
 sudo $BPFTOOL cgroup attach /sys/fs/cgroup/unified/ sock_ops pinned /sys/fs/bpf/${PROGRAM_NAME}
