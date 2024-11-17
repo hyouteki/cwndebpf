@@ -11,4 +11,4 @@ if [ -f "/sys/fs/bpf/log_tcp_cwnd" ]; then
 	rm -f /sys/fs/bpf/log_tcp_cwnd
 fi
 
-rm -f /sys/fs/bpf/CwndMap /sys/fs/bpf/SSThreshMap
+rm -f /sys/fs/bpf/{CwndMap,SSThreshMap}
