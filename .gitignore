@@ -1,3 +1,5 @@
 build/
 .vscode/
 vmlinux.h
+scripts/
+.emacs.custom.el

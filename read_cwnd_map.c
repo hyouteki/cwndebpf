@@ -19,7 +19,7 @@ int main() {
         return 1;
     }
 
-    printf("log: congestion window: %u\n", value);
+    fprintf(stdout, "%u\n", value);
 
     return 0;
 }
