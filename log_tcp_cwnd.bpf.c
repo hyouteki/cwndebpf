@@ -29,17 +29,20 @@ int log_tcp_cwnd(struct trace_event_raw_tcp_probe *ctx) {
 		return 0;
 	}
 
-    u32 snd_cwnd = 0, snd_wnd = 0, rcv_wnd = 0;
+    u32 snd_cwnd = 0, snd_wnd = 0, rcv_wnd = 0, ssthresh = 0;
     bpf_probe_read(&snd_cwnd, sizeof(snd_cwnd), &ctx->snd_cwnd);
     bpf_probe_read(&snd_wnd, sizeof(snd_wnd), &ctx->snd_wnd);
     bpf_probe_read(&rcv_wnd, sizeof(rcv_wnd), &ctx->rcv_wnd);
+    bpf_probe_read(&ssthresh, sizeof(ssthresh), &ctx->ssthresh);
 
-    bpf_printk("snd_cwnd: %d, snd_wnd: %d, rcv_wnd: %d\n", snd_cwnd, snd_wnd, rcv_wnd);
+    bpf_printk("snd_cwnd: %lu, snd_wnd: %lu, rcv_wnd: %lu\n, sshresh: %lu\n", snd_cwnd, snd_wnd, rcv_wnd, ssthresh);
 
 #if Store_Cwnd
     u32 key = 0;
     int ret = bpf_map_update_elem(&CwndMap, &key, &snd_wnd, BPF_ANY);
-	if (ret != 0) bpf_printk("log: cwnd value update to '%d' failed", snd_wnd);
+	if (ret != 0) bpf_printk("log: CWND update to '%lu' failed", snd_wnd);
+    ret = bpf_map_update_elem(&SSThresh, &key, &ssthresh, BPF_ANY);
+    if (ret != 0) bpf_printk("log: SSThresh update to '%lu' failed", sthresh);
 #endif
 
     return 0;
