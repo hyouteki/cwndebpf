@@ -1,24 +1,37 @@
+#!/usr/bin/python3
 import csv
 import re
+from termcolor import colored
+import sys
 
-pattern = re.compile(r"(\d+\.\d+):.*bpf_trace_printk: snd_cwnd: (\d+), snd_wnd: (\d+), rcv_wnd: (\d+)")
+LOG_FILE_PATH = sys.argv[1] if len(sys.argv) > 1 else "tcp_readings.log"
+CSV_FILE_PATH = sys.argv[2] if len(sys.argv) > 2 else "tcp_readings.csv"
 
-with open("log_tcp_cwnd.log", "r") as log_file, open("log_tcp_cwnd.csv", "w", newline="") as csv_file:
+data = []
+
+first_timestamp = None
+
+with open(LOG_FILE_PATH, "r") as log_file, open(CSV_FILE_PATH, "w") as csv_file:
     csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(["timestamp_seconds", "snd_cwnd", "snd_wnd", "rcv_wnd"])
+    csv_writer.writerow(["timestamp", "snd_cwnd", "snd_wnd", "rcv_wnd", "ssthresh"])
 
-    first_timestamp = None
-    for line in log_file:
-        match = pattern.search(line)
-        if not match:
+    lines = log_file.readlines()
+    for i in range(len(lines)-1):
+        if "snd_cwnd" not in lines[i]:
             continue
 
-        timestamp = float(match.group(1))
+        line = lines[i].split()
+        timestamp = float(line[3][: -1])
+        snd_cwnd = int(line[6][: -1])
+        snd_wnd = int(line[8][: -1])
+        rcv_wnd = int(line[10])
+        assert "sshresh" in lines[i+1]
+        ssthresh = int(lines[i+1].split()[6])
+
         if first_timestamp is None:
             first_timestamp = timestamp
+        timestamp = int(timestamp - first_timestamp)
 
-        relative_timestamp = int(timestamp - first_timestamp)
-        snd_cwnd, snd_wnd, rcv_wnd = match.groups()[1:]
-        csv_writer.writerow([relative_timestamp, snd_cwnd, snd_wnd, rcv_wnd])
+        csv_writer.writerow([timestamp, snd_cwnd, snd_wnd, rcv_wnd, ssthresh])
 
-print("info: logs processed and stored in log_tcp_cwnd.csv")
+print(f"info: logs processed and stored in '{CSV_FILE_PATH}'")
