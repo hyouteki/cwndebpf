@@ -20,18 +20,22 @@ with open(LOG_FILE_PATH, "r") as log_file, open(CSV_FILE_PATH, "w") as csv_file:
         if "snd_cwnd" not in lines[i]:
             continue
 
-        line = lines[i].split()
-        timestamp = float(line[3][: -1])
-        snd_cwnd = int(line[6][: -1])
-        snd_wnd = int(line[8][: -1])
-        rcv_wnd = int(line[10])
-        assert "sshresh" in lines[i+1]
-        ssthresh = int(lines[i+1].split()[6])
+        try:
+            line = lines[i].split()
+            timestamp = float(line[3][: -1])
+            snd_cwnd = int(line[6][: -1])
+            snd_wnd = int(line[8][: -1])
+            rcv_wnd = int(line[10])
+            assert "sshresh" in lines[i+1]
+            ssthresh = int(lines[i+1].split()[6])
 
-        if first_timestamp is None:
-            first_timestamp = timestamp
-        timestamp = int(timestamp - first_timestamp)
+            if first_timestamp is None:
+                first_timestamp = timestamp
+            timestamp = int(timestamp - first_timestamp)
 
-        csv_writer.writerow([timestamp, snd_cwnd, snd_wnd, rcv_wnd, ssthresh])
+            csv_writer.writerow([timestamp, snd_cwnd, snd_wnd, rcv_wnd, ssthresh])
+
+        except:
+            continue
 
 print(f"info: logs processed and stored in '{CSV_FILE_PATH}'")
